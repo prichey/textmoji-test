@@ -74,7 +74,7 @@
     <!-- <canvas bind:this={view} /> -->
   </div>
   <div>
-    <img width="20" height="20" src={dataUrl} alt="" />
+    <img width="32" height="32" src={dataUrl} alt="" />
   </div>
   <div>
     <button on:click={download}>download!</button>
