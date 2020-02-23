@@ -83,10 +83,14 @@
   }
 </style>
 
+<svelte:head>
+  <link rel="icon" type="image/png" href={dataUrl} />
+</svelte:head>
+
 <main>
   <h1>textmoji</h1>
-  <input bind:value={text} on:input={updateText} type="text" />
   <div>
+    <input bind:value={text} on:input={updateText} type="text" />
     <input bind:value={bgColor} on:input={updateBgColor} type="color" />
     <div bind:this={canvasRoot} />
   </div>
