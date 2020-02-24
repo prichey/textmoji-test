@@ -5,7 +5,7 @@
 
   let canvasRoot;
   let text = 'text moji';
-  let bgColor = '#de3249';
+  let bgColor = '#013E9A';
   let dataUrl;
 
   onMount(() => {
