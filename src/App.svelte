@@ -6,7 +6,9 @@
   let canvasRoot;
   let text = 'text moji';
   let bgColor = '#013E9A';
+  let textColor = '#ffffff';
   let dataUrl;
+  let fontSize = 40;
 
   onMount(() => {
     canvasRoot.appendChild(app.view);
@@ -18,7 +20,6 @@
     height: config.height,
     transparent: true,
     antialias: true,
-    // view: view,
     preserveDrawingBuffer: true
   });
 
@@ -37,27 +38,32 @@
   const padding = 5;
   const style = new PIXI.TextStyle({
     fontFamily: 'Arial',
-    fontSize: 40,
-    fill: '#fff',
+    fontSize,
+    fill: textColor,
     wordWrap: true,
     wordWrapWidth: config.width - padding * 2,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    align: 'center'
   });
 
   const basicText = new PIXI.Text(text, style);
   basicText.zIndex = 10;
-  basicText.x = padding;
-  basicText.y = padding;
+  basicText.x = config.width / 2;
+  basicText.y = config.height / 2;
+  basicText.anchor.set(0.5);
   container.addChild(basicText);
   basicText.text = text;
 
-  app.render();
-  dataUrl = app.view.toDataURL('image/png');
+  const updateCanvas = () => {
+    app.render();
+    dataUrl = app.view.toDataURL('image/png');
+  };
+
+  updateCanvas();
 
   const updateText = () => {
     basicText.text = text;
-    app.render();
-    dataUrl = app.view.toDataURL('image/png');
+    updateCanvas();
   };
 
   const updateBgColor = () => {
@@ -66,7 +72,17 @@
     bg.drawRoundedRect(0, 0, config.width, config.height, bgRadius);
     bg.endFill();
     container.addChild(bg);
-    dataUrl = app.view.toDataURL('image/png');
+    updateCanvas();
+  };
+
+  const updateTextColor = () => {
+    style.fill = textColor;
+    updateCanvas();
+  };
+
+  const updateFontSize = () => {
+    style.fontSize = fontSize;
+    updateCanvas();
   };
 
   const download = () => {
@@ -91,7 +107,29 @@
   <h1>textmoji</h1>
   <div>
     <input bind:value={text} on:input={updateText} type="text" />
-    <input bind:value={bgColor} on:input={updateBgColor} type="color" />
+  </div>
+  <div>
+    <input
+      bind:value={textColor}
+      on:change={updateTextColor}
+      on:input={updateTextColor}
+      type="color" />
+    <input
+      bind:value={bgColor}
+      on:change={updateBgColor}
+      on:input={updateBgColor}
+      type="color" />
+  </div>
+  <div>
+    <input
+      bind:value={fontSize}
+      min={12}
+      max={120}
+      step={1}
+      type="range"
+      on:input={updateFontSize} />
+  </div>
+  <div>
     <div bind:this={canvasRoot} />
   </div>
   <div>
