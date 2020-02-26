@@ -1,6 +1,6 @@
 <script>
   import * as PIXI from 'pixi.js';
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { saveAs } from 'file-saver';
 
   let canvasRoot;
@@ -10,10 +10,6 @@
   let dataUrl;
   let fontSize = 40;
 
-  onMount(() => {
-    canvasRoot.appendChild(app.view);
-  });
-
   const config = { width: 100, height: 100 };
   const app = new PIXI.Application({
     width: config.width,
@@ -21,6 +17,14 @@
     transparent: true,
     antialias: true,
     preserveDrawingBuffer: true
+  });
+
+  onMount(() => {
+    canvasRoot.appendChild(app.view);
+  });
+
+  onDestroy(() => {
+    app.destroy(true);
   });
 
   const container = new PIXI.Container();
