@@ -1,0 +1,17 @@
+defaultState:
+  text: 'text moji'
+  bgColor: '#013E9A'
+  fontColor: '#ffffff'
+  fontSize: 40
+  fontFamily: 'Roboto'
+canvasProps:
+  width: 100
+  height: 100
+  padding: 5
+fonts:
+  - 'Roboto'
+  - 'Anton'
+  - 'Bree Serif'
+  - 'Fredoka One'
+  - 'Chivo'
+  - 'Press Start 2P'

@@ -3,18 +3,29 @@
 
   import { onMount, onDestroy } from 'svelte';
   import { saveAs } from 'file-saver';
+  import { debounce } from 'debounce';
+
+  import { canvasProps, fonts } from './config.yaml';
+  import { text, bgColor, fontColor, fontSize, fontFamily } from './store';
+  import { loadWebfonts, sanitizeFilename } from './utils';
+
+  window.WebFontConfig = {
+    google: {
+      families: fonts.map(font => `${font.replace('+', '')}`)
+    },
+
+    active() {
+      initText();
+    }
+  };
 
   let canvasRoot;
-  let text = 'text moji';
-  let bgColor = '#013E9A';
-  let textColor = '#ffffff';
   let dataUrl;
-  let fontSize = 40;
+  let basicText;
 
-  const config = { width: 100, height: 100 };
   const app = new PIXI.Application({
-    width: config.width,
-    height: config.height,
+    width: canvasProps.width,
+    height: canvasProps.height,
     transparent: true,
     antialias: true,
     preserveDrawingBuffer: true
@@ -22,6 +33,7 @@
 
   onMount(() => {
     canvasRoot.appendChild(app.view);
+    loadWebfonts();
   });
 
   onDestroy(() => {
@@ -35,66 +47,72 @@
   const bg = new PIXI.Graphics();
   bg.zIndex = 0;
   const bgRadius = 10;
-  bg.beginFill(PIXI.utils.string2hex(bgColor));
-  bg.drawRoundedRect(0, 0, config.width, config.height, bgRadius);
+  bg.beginFill(PIXI.utils.string2hex($bgColor));
+  bg.drawRoundedRect(0, 0, canvasProps.width, canvasProps.height, bgRadius);
   bg.endFill();
   container.addChild(bg);
 
-  const padding = 5;
   const style = new PIXI.TextStyle({
-    fontFamily: 'Arial',
-    fontSize,
-    fill: textColor,
+    fontFamily: $fontFamily,
+    fontSize: $fontSize,
+    fill: $fontColor,
     wordWrap: true,
-    wordWrapWidth: config.width - padding * 2,
-    fontWeight: 'bold',
+    wordWrapWidth: canvasProps.width - canvasProps.padding * 2,
+    // fontWeight: 'bold',
     align: 'center'
   });
 
-  const basicText = new PIXI.Text(text, style);
-  basicText.zIndex = 10;
-  basicText.x = config.width / 2;
-  basicText.y = config.height / 2;
-  basicText.anchor.set(0.5);
-  container.addChild(basicText);
-  basicText.text = text;
-
-  const updateCanvas = () => {
+  const updateCanvas = debounce(() => {
     app.render();
     dataUrl = app.view.toDataURL('image/png');
-  };
+  }, 25);
 
   updateCanvas();
 
+  const initText = () => {
+    basicText = new PIXI.Text(text, style);
+    basicText.zIndex = 10;
+    basicText.x = canvasProps.width / 2;
+    basicText.y = canvasProps.height / 2;
+    basicText.anchor.set(0.5);
+    container.addChild(basicText);
+    updateText();
+  };
+
   const updateText = () => {
-    basicText.text = text;
+    basicText.text = $text;
     updateCanvas();
   };
 
   const updateBgColor = () => {
     bg.clear();
-    bg.beginFill(PIXI.utils.string2hex(bgColor));
-    bg.drawRoundedRect(0, 0, config.width, config.height, bgRadius);
+    bg.beginFill(PIXI.utils.string2hex($bgColor));
+    bg.drawRoundedRect(0, 0, canvasProps.width, canvasProps.height, bgRadius);
     bg.endFill();
     container.addChild(bg);
     updateCanvas();
   };
 
-  const updateTextColor = () => {
-    style.fill = textColor;
+  const updateFontColor = () => {
+    style.fill = $fontColor;
+    updateCanvas();
+  };
+
+  const updateFontFamily = () => {
+    style.fontFamily = $fontFamily;
     updateCanvas();
   };
 
   const updateFontSize = () => {
-    style.fontSize = fontSize;
+    style.fontSize = $fontSize;
     updateCanvas();
   };
 
   const download = () => {
-    app.view.toBlob(blob => saveAs(blob, `textmoji-${getFilename(text)}.png`));
+    app.view.toBlob(blob =>
+      saveAs(blob, `textmoji-${sanitizeFilename($text)}.png`)
+    );
   };
-
-  const getFilename = str => str.replace(/([^a-z0-9]+)/gi, '');
 </script>
 
 <style>
@@ -111,23 +129,30 @@
 <main>
   <h1>textmoji</h1>
   <div>
-    <input bind:value={text} on:input={updateText} type="text" />
+    <input bind:value={$text} on:input={updateText} type="text" />
   </div>
   <div>
     <input
-      bind:value={textColor}
-      on:change={updateTextColor}
-      on:input={updateTextColor}
+      bind:value={$fontColor}
+      on:change={updateFontColor}
+      on:input={updateFontColor}
       type="color" />
     <input
-      bind:value={bgColor}
+      bind:value={$bgColor}
       on:change={updateBgColor}
       on:input={updateBgColor}
       type="color" />
   </div>
   <div>
+    <select bind:value={$fontFamily} on:change={updateFontFamily}>
+      {#each fonts as font}
+        <option value={font}>{font}</option>
+      {/each}
+    </select>
+  </div>
+  <div>
     <input
-      bind:value={fontSize}
+      bind:value={$fontSize}
       min={12}
       max={120}
       step={1}

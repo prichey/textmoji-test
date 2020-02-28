@@ -20,6 +20,8 @@
     "@pixi/utils": "^5.2.1",
     "@rollup/plugin-commonjs": "^11.0.0",
     "@rollup/plugin-node-resolve": "^7.0.0",
+    "@rollup/plugin-yaml": "^2.1.0",
+    "debounce": "^1.2.0",
     "file-saver": "^2.0.2",
     "rollup": "^1.20.0",
     "rollup-plugin-livereload": "^1.0.0",
