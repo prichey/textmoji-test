@@ -12,15 +12,7 @@ export default {
     sourcemap: true,
     format: 'iife',
     name: 'app',
-    file: 'public/build/bundle.js',
-    globals: {
-      'pixi.js': 'PIXI'
-      // "pixi-filters": "PIXI.filters"
-    },
-    external: [
-      'pixi.js'
-      // "pixi-filters"
-    ]
+    file: 'public/build/bundle.js'
   },
   plugins: [
     svelte({

@@ -1,5 +1,6 @@
 <script>
-  import * as PIXI from 'pixi.js';
+  import * as PIXI from './pixi.js';
+
   import { onMount, onDestroy } from 'svelte';
   import { saveAs } from 'file-saver';
 
